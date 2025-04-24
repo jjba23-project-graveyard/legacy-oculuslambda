@@ -94,3 +94,4 @@
 
 ;; Add a hook on SIGINT to stop the queue worker
 (run-when-sigint! cancel-worker)
+
