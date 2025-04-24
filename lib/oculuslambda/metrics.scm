@@ -32,25 +32,29 @@
   #:use-module (ice-9 string-fun)
   #:use-module (ice-9 iconv))
 
-
 (define-public (record-stat stat cmd)
   (let* ((stat-data (syscall-silent cmd))
          (now (current-time)))
     (catch #t
-      (lambda ()
-        ($stat 'set
-               #:id stat
-               #:stat_data stat-data
-               #:stat_cmd cmd
-               #:updated_at now))
-      (lambda (key . args)
-        (let* ((conn (get-conn-from-pool!)))
-          (DB-query conn
-                    (->sql update
-                           'stat set
-                           `((id ,stat)
-                             (stat_data ,(escape-str stat-data))
-                             (stat_cmd ,cmd)
-                             (updated_at ,now))
-                           (where #:id stat)))
-          (DB-close conn))))))
+           (lambda ()
+             ($stat 'set
+                    #:id stat
+                    #:stat_data stat-data
+                    #:stat_cmd cmd
+                    #:updated_at now))
+           (lambda (key . args)
+             (catch #t
+                    (lambda ()
+                      (let* ((conn (get-conn-from-pool!)))
+                        (DB-query conn
+                                  (->sql update
+                                         'stat set
+                                         `((id ,stat)
+                                           (stat_data ,(escape-str stat-data))
+                                           (stat_cmd ,cmd)
+                                           (updated_at ,now))
+                                         (where #:id stat)))
+                        (DB-close conn)))
+                    (lambda (key . args)
+                      (display (format #f "error saving metric: ~a: ~a!" stat
+                                       cmd))))))))
