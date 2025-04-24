@@ -120,7 +120,7 @@ dev:
 # Start the server with the default configuration
 server:
 	$(call oculuslambda-log-info,"starting oculuslambda server")
-	guix shell -m manifest.scm -- art work
+	guix shell -m manifest.scm -- art work 
 
 # Target to start the oculuslambda server with production configuration
 production-server:

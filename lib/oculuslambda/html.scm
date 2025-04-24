@@ -16,7 +16,6 @@
 ;; along with oculuslambda.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (oculuslambda html)
-  #:use-module (oculuslambda url)
   #:use-module (oculuslambda query-escape)
   #:use-module (sxml simple)
   #:use-module (ice-9 popen)

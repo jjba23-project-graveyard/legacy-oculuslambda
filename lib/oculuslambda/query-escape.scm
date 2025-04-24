@@ -1,7 +1,6 @@
 ;;; oculuslambda - the eye into the system's functioning
 
 ;; Copyright © "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
-;; Copyright © "Mu Lei" known as "NalaGinrut" <NalaGinrut@gmail.com>
 
 ;; oculuslambda is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
