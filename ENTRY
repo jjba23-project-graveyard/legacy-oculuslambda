@@ -53,3 +53,55 @@
 ;; Set base locale for gettext at startup
 (setlocale LC_MESSAGES "en_US.UTF-8")
 
+;; Store the thread object belonging to the oculuslambda queue worker
+(define worker-thread
+  #f)
+
+
+;; Procedure to start the oculuslambda queue worker to process jobs that haven't completed yet
+;; this is preferrably done in a different thread
+(define (start-worker)
+  (let* ((t (call-with-new-thread (lambda ()
+                                    (display (format #f
+                                                     "\n~a...\n"
+                                                     (gettext
+                                                      "initializing oculuslambda queue worker")))
+
+                                    (use-modules (oculuslambda metrics)
+                                                 (fibers)
+                                                 (app models stat))
+                                    (while #t
+
+                                      (display "db access")
+                                      (display ($stat 'get))
+                                      (record-stat 'hostname "hostname")
+                                      ;; (run-fibers (lambda ()
+                                      ;;               (spawn-fiber (lambda ()
+                                      ;;                              (assoc-set! oculuslambda-state 'hostname (get-hostname))))
+                                      ;;               (spawn-fiber (lambda ()
+                                      ;;                              (assoc-set! oculuslambda-state 'uptime (get-uptime))))
+                                      ;;               (spawn-fiber (lambda ()
+                                      ;;                              (assoc-set! oculuslambda-state 'uname (get-uname))))
+                                      ;;               (spawn-fiber (lambda ()
+                                      ;;                              (assoc-set! oculuslambda-state 'disk (get-disk))))
+                                      ;;               (spawn-fiber (lambda ()
+                                      ;;                              (assoc-set! oculuslambda-state 'part (get-part))))
+                                      ;;               (spawn-fiber (lambda ()
+                                      ;;                              (assoc-set! oculuslambda-state 'mem (get-mem)))))
+                                      ;;             #:drain? #t)
+
+                                      (display "collected metrics!")
+                                      (sleep 10)
+                                      )))))
+    (set! worker-thread t)))
+
+;; Add hook on before running the Artanis application to start the queue worker
+(run-before-run! start-worker)
+
+;; Procedure to stop the oculuslambda queue worker
+(define (cancel-worker)
+  (display "\nterminating oculuslambda queue worker\n")
+  (cancel-thread worker-thread))
+
+;; Add a hook on SIGINT to stop the queue worker
+(run-when-sigint! cancel-worker)

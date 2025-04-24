@@ -22,57 +22,18 @@
         (artanis i18n locale)
         (app views index)
         (oculuslambda html)
+        (app models stat)
+        (oculuslambda metrics)
         (fibers)
         (fibers channels)
         (ice-9 match)
         (oculuslambda process))
 
-(define (get-uptime)
-  (syscall-silent "uptime"))
-
-(define (get-uname)
-  (syscall-silent "uname -a"))
-
-(define (get-hostname)
-  (syscall-silent "hostname"))
-
-(define (get-mem)
-  (syscall-silent "free -h"))
-
-(define (get-disk)
-  (syscall-silent "df -h"))
-
-(define (get-part)
-  (syscall-silent "lsblk"))
 
 (get "/"
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (let* ((state `()))
-         (run-fibers (lambda ()
-                       (spawn-fiber (lambda ()
-                                      (set! state
-                                            (cons `(hostname ,(get-hostname))
-                                                  state))))
-                       (spawn-fiber (lambda ()
-                                      (set! state
-                                            (cons `(uptime ,(get-uptime))
-                                                  state))))
-                       (spawn-fiber (lambda ()
-                                      (set! state
-                                            (cons `(uname ,(get-uname)) state))))
-                       (spawn-fiber (lambda ()
-                                      (set! state
-                                            (cons `(memory ,(get-mem)) state))))
-                       (spawn-fiber (lambda ()
-                                      (set! state
-                                            (cons `(partitioning ,(get-part))
-                                                  state))))
-                       (spawn-fiber (lambda ()
-                                      (set! state
-                                            (cons `(disk-space ,(get-disk))
-                                                  state)))))
-                     #:drain? #t)
+       (let* ((stats ($stat 'get)))
          (response-emit (:mime rc
-                               (dashboard-page rc state))))))
+                         (dashboard-page rc stats))))))
