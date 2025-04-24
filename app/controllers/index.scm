@@ -20,7 +20,8 @@
 (import (web uri)
         (artanis i18n)
         (artanis i18n locale)
-        (app views index))
+        (app views index)
+        (oculuslambda html))
 
 (get "/"
      #:i18n '(cookie "lang")
@@ -28,4 +29,5 @@
      (lambda (rc)
        (response-emit (:mime rc
                        (dashboard-page rc)))))
+
 

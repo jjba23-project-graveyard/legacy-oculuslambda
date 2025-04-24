@@ -1,8 +1,8 @@
-*.byggsteg.log
+*.oculuslambda.log
 .guix
 *~
 tmp/*
-byggsteg.db
-byggsteg.db-shm
-byggsteg.db-wal
+oculuslambda.db
+oculuslambda.db-shm
+oculuslambda.db-wal
 *.log

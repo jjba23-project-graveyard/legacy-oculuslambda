@@ -18,6 +18,7 @@
 (define-module (app views index)
   #:use-module (ice-9 i18n)
   #:use-module (artanis i18n)
+  #:use-module (oculuslambda html)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n sxml)
   #:use-module (hygguile abstraction)
