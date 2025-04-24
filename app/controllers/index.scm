@@ -22,6 +22,9 @@
         (artanis i18n locale)
         (app views index)
         (oculuslambda html)
+        (fibers)
+        (fibers channels)
+        (ice-9 match)
         (oculuslambda process))
 
 (define (get-uptime)
@@ -46,13 +49,30 @@
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (let* ((state `((hostname ,(get-hostname))
-                       (uptime ,(get-uptime))
-                       (uname ,(get-uname))
-                       (mem ,(get-mem))
-                       (part ,(get-part))
-                       (disk ,(get-disk)))))
+       (let* ((state `()))
+         (run-fibers (lambda ()
+                       (spawn-fiber (lambda ()
+                                      (set! state
+                                            (cons `(hostname ,(get-hostname))
+                                                  state))))
+                       (spawn-fiber (lambda ()
+                                      (set! state
+                                            (cons `(uptime ,(get-uptime))
+                                                  state))))
+                       (spawn-fiber (lambda ()
+                                      (set! state
+                                            (cons `(uname ,(get-uname)) state))))
+                       (spawn-fiber (lambda ()
+                                      (set! state
+                                            (cons `(memory ,(get-mem)) state))))
+                       (spawn-fiber (lambda ()
+                                      (set! state
+                                            (cons `(partitioning ,(get-part))
+                                                  state))))
+                       (spawn-fiber (lambda ()
+                                      (set! state
+                                            (cons `(disk-space ,(get-disk))
+                                                  state)))))
+                     #:drain? #t)
          (response-emit (:mime rc
-                         (dashboard-page rc state))))))
-
-
+                               (dashboard-page rc state))))))
