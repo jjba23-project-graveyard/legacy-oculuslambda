@@ -42,17 +42,18 @@
 
 (define-public (system-detail-list-page rc state)
   (let* ((G_ (:i18n rc))
-         (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4))))
+         (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4 flex flex-col gap-3))))
                              ,(map (lambda (s)
-                                     `((dt (@ (class ,(->css '(font-bold))))
-                                           ,(assoc-ref s "id"))
-                                       (dd (@ (class ,(->css '(overflow-auto
-                                                               text-sm p-1
-                                                               mx-2
-                                                               whitespace-pre
-                                                               font-mono))))
-                                           ,(unescape-str (assoc-ref s
-                                                                     "stat_data")))))
+                                     `((div (@(class ,(->css '(p-2 bg-stone-300 rounded-xl))))
+                                            (dt (@ (class ,(->css '(font-bold))))
+                                                ,(assoc-ref s "id"))
+                                            (dd (@ (class ,(->css '(overflow-auto
+                                                                    text-sm p-1
+                                                                    mx-2
+                                                                    whitespace-pre
+                                                                    font-mono))))
+                                                ,(unescape-str (assoc-ref s
+                                                                          "stat_data"))))))
                                    state)))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
@@ -61,18 +62,20 @@
 
 (define-public (system-detail-grid-page rc state)
   (let* ((G_ (:i18n rc))
-         (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4))))
-                             ,(map (lambda (s)
-                                     `((dt (@ (class ,(->css '(font-bold))))
-                                           ,(assoc-ref s "id"))
-                                       (dd (@ (class ,(->css '(overflow-auto
-                                                               text-sm p-1
-                                                               mx-2
-                                                               whitespace-pre
-                                                               font-mono))))
-                                           ,(unescape-str (assoc-ref s
-                                                           "stat_data")))))
-                                   state)))))
+         (welcome-html `((div (@ (class ,(->css '(mx-1 my-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2))))
+                              ,(map (lambda (s)
+                                      `((div (@(class ,(->css '(p-2 bg-stone-300 rounded-xl))))
+                                             (span (@(class ,(->css '(font-bold)))) ,(assoc-ref s "id"))
+                                             (div (@ (class ,(->css '(overflow-auto
+                                                                      text-sm p-1
+                                                                      mx-2
+                                                                      whitespace-pre
+                                                                      font-mono))))
+                                                  ,(unescape-str (assoc-ref s
+                                                                            "stat_data"))))
+                                        
+                                        ))
+                                    state)))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))

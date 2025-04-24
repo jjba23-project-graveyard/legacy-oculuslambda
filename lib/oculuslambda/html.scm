@@ -70,7 +70,7 @@
   (export oculuslambda-html-template))
 
 (define-public (page-top G_)
-  `((div (@(class ,(->css '(my-6 mx-2))))
+  `((div (@(class ,(->css '(my-6 mx-2 flex flex-col gap-3))))
          (div (@(class ,(->css '(flex flex-row flex-wrap justify-left align-center gap-3))))
               (h1 (@ (class ,(->css '(text-3xl font-bold))))
                   (a (@(href "/")) ,(G_ "oculuslambda")))
@@ -79,11 +79,11 @@
                                             justify-center
                                             align-center w-max))))
                    (a (@ (href "/dashboard/system-detail-list"))
-                      ,(hyg-button #:content (G_
-                                              "system detail list")))
+                      ,(hyg-icon-button #:icon 'list  #:content (G_
+                                                                 "list view")))
                    (a (@ (href "/dashboard/system-detail-grid"))
-                      ,(hyg-button #:content (G_
-                                              "system detail grid")))))
+                      ,(hyg-icon-button #:icon 'squares-four #:content (G_
+                                                                        "grid view")))))
          (h3 (em ,(G_ "the eye into the system's functioning"))))))
 
 (define-public (page-footer G_)
