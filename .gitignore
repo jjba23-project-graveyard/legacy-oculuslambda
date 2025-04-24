@@ -1,0 +1,8 @@
+*.byggsteg.log
+.guix
+*~
+tmp/*
+byggsteg.db
+byggsteg.db-shm
+byggsteg.db-wal
+*.log
