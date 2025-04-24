@@ -34,6 +34,21 @@
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
+       (response-emit (:mime rc
+                       (welcome-page rc)))))
+
+(get "/dashboard/system-detail-grid"
+     #:i18n '(cookie "lang")
+     #:mime 'xml
+     (lambda (rc)
        (let* ((stats ($stat 'get)))
          (response-emit (:mime rc
-                         (dashboard-page rc stats))))))
+                         (system-detail-grid-page rc stats))))))
+
+(get "/dashboard/system-detail-list"
+     #:i18n '(cookie "lang")
+     #:mime 'xml
+     (lambda (rc)
+       (let* ((stats ($stat 'get)))
+         (response-emit (:mime rc
+                         (system-detail-list-page rc stats))))))

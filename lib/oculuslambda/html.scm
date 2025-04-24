@@ -26,6 +26,7 @@
   #:use-module (web uri)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components icon)
+  #:use-module (hygguile components button)
   #:use-module (artanis artanis)
   #:use-module (ice-9 string-fun)
   #:use-module (ice-9 iconv)
@@ -36,30 +37,30 @@
                                        #:key title body
                                        (should-auto-refresh #f))
     (let ((maybe-auto-refresh (cond
-                                ((equal? should-auto-refresh #t)
-                                 `(meta (@ (content "10")
-                                           (http-equiv "refresh")) ()))
-                                (else `()))))
+                               ((equal? should-auto-refresh #t)
+                                `(meta (@ (content "10")
+                                          (http-equiv "refresh")) ()))
+                               (else `()))))
       
       `("<!DOCTYPE html>" (html (@ (lang en))
                                 (head (title ,title)
                                       (style ,(assoc-ref asset-library
                                                          "pub/css/fonts.css"))
                                       (style ,(assoc-ref asset-library
-                                               "pub/css/phosphor.css"))
+                                                         "pub/css/phosphor.css"))
 
                                       ,maybe-auto-refresh
                                       (meta (@ (name viewport)
                                                (content
                                                 "width=device-width, initial-scale=1.0")))
                                       (script ,(assoc-ref asset-library
-                                                "pub/js/tailwind.js"))
+                                                          "pub/js/tailwind.js"))
                                       (script ,(assoc-ref asset-library
-                                                "pub/js/tailwind.config.js")))
-                                (body (@ (class ,(->css '(bg-stone-900))))
+                                                          "pub/js/tailwind.config.js")))
+                                (body (@ (class ,(->css '(bg-stone-200))))
                                       (div (@ (class ,(->css '(flex flex-col
-                                                               h-screen
-                                                               justify-between))))
+                                                                    h-screen
+                                                                    justify-between))))
                                            (div ,(page-top G_)
                                                 (div (@ (class ,(->css '(my-4
                                                                          container
@@ -69,10 +70,23 @@
   (export oculuslambda-html-template))
 
 (define-public (page-top G_)
-  `(p ,(G_ "work in progress!")))
+  `((div (@(class ,(->css '(my-6 mx-2))))
+         (div (@(class ,(->css '(flex flex-row flex-wrap justify-left align-center gap-3))))
+              (h1 (@ (class ,(->css '(text-3xl font-bold))))
+                  (a (@(href "/")) ,(G_ "oculuslambda")))
+              (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                            gap-4
+                                            justify-center
+                                            align-center w-max))))
+                   (a (@ (href "/dashboard/system-detail-list"))
+                      ,(hyg-button #:content (G_
+                                              "system detail list")))
+                   (a (@ (href "/dashboard/system-detail-grid"))
+                      ,(hyg-button #:content (G_
+                                              "system detail grid")))))
+         (h3 (em ,(G_ "the eye into the system's functioning"))))))
 
 (define-public (page-footer G_)
-  `((div
-     (p ,(G_ "licensed under the GPL v3 or later"))
-     (p ,(G_ "Copyright &copy; Josep Bigorra &lt;jjbigorra@gmail.com&gt;")))))
+  `((div (p ,(G_ "licensed under the GPL v3 or later"))
+         (p ,(G_ "Copyright &copy; Josep Bigorra &lt;jjbigorra@gmail.com&gt;")))))
 

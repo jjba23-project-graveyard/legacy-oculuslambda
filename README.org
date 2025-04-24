@@ -7,4 +7,4 @@
 
 oculuslambda is written in Lisp (Guile Scheme), leverages SXML, SQLite3, some basic POSIX / UNIX utilities, and the mighty GNU Artanis web-framework.
 
-Monitoring tool, observability, alerting, dashboarding and more, all configurable in Lisp (Guile Scheme).
+This is a system monitoring tool, observability, alerting, dashboarding and more, all configurable in Lisp (Guile Scheme).

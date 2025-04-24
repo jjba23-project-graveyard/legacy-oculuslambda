@@ -23,16 +23,26 @@
   #:use-module (artanis artanis)
   #:use-module (artanis i18n sxml)
   #:use-module (hygguile abstraction)
+  #:use-module (hygguile components button)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (dashboard-page rc state)
+(define-public (welcome-page rc)
   (let* ((G_ (:i18n rc))
-         (welcome-html `((h1 (@ (class ,(->css '(text-2xl font-bold))))
-                             ,(G_ "oculuslambda"))
-                         (h3 (em ,(G_ "the eye into the system's functioning")))
-                         (dl (@ (class ,(->css '(mx-1 my-4))))
+         (welcome-html `((div (p ,(G_
+                                   "oculuslambda is written in Lisp (Guile Scheme), leverages SXML, SQLite3, some basic POSIX / UNIX utilities, and the mighty GNU Artanis web-framework."))
+                              (p ,(G_
+                                   "This is a system monitoring tool, observability, alerting, dashboarding and more, all configurable in Lisp (Guile Scheme).")))
+                         )))
+    (oculuslambda-html-template G_
+                                #:title (format #f "oculuslambda - ~a"
+                                                (G_ "welcome to oculuslambda"))
+                                #:body welcome-html)))
+
+(define-public (system-detail-list-page rc state)
+  (let* ((G_ (:i18n rc))
+         (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4))))
                              ,(map (lambda (s)
                                      `((dt (@ (class ,(->css '(font-bold))))
                                            ,(assoc-ref s "id"))
@@ -41,7 +51,28 @@
                                                                mx-2
                                                                whitespace-pre
                                                                font-mono))))
-                                           ,(unescape-str (assoc-ref s "stat_data"))))) state)))))
+                                           ,(unescape-str (assoc-ref s
+                                                                     "stat_data")))))
+                                   state)))))
+    (oculuslambda-html-template G_
+                                #:title (format #f "oculuslambda - ~a"
+                                                (G_ "welcome to oculuslambda"))
+                                #:body welcome-html)))
+
+(define-public (system-detail-grid-page rc state)
+  (let* ((G_ (:i18n rc))
+         (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4))))
+                             ,(map (lambda (s)
+                                     `((dt (@ (class ,(->css '(font-bold))))
+                                           ,(assoc-ref s "id"))
+                                       (dd (@ (class ,(->css '(overflow-auto
+                                                               text-sm p-1
+                                                               mx-2
+                                                               whitespace-pre
+                                                               font-mono))))
+                                           ,(unescape-str (assoc-ref s
+                                                           "stat_data")))))
+                                   state)))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
