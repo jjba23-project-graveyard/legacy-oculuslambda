@@ -23,6 +23,8 @@
   #:use-module (ice-9 regex)
   #:use-module (app models stat)
   #:use-module (srfi srfi-1)
+  #:use-module (artanis db)
+  #:use-module (artanis ssql)
   #:use-module (srfi srfi-64)
   #:use-module (oculuslambda prelude)
   #:use-module (oculuslambda process)
@@ -30,28 +32,25 @@
   #:use-module (ice-9 string-fun)
   #:use-module (ice-9 iconv))
 
-(define-public (get-uptime)
-  (syscall-silent "uptime"))
-
-(define-public (get-uname)
-  (syscall-silent "uname -a"))
-
-(define-public (get-hostname)
-  (syscall-silent "hostname"))
-
-(define-public (get-mem)
-  (syscall-silent "free -h"))
-
-(define-public (get-disk)
-  (syscall-silent "df -h"))
-
-(define-public (get-part)
-  (syscall-silent "lsblk"))
 
 (define-public (record-stat stat cmd)
-  ($stat 'set
-         #:id stat
-         #:stat_data (syscall-silent cmd)
-         #:stat_cmd  cmd
-         #:updated_at (current-time)
-         #:condition (where #:id (symbol->string stat))))
+  (let* ((stat-data (syscall-silent cmd))
+         (now (current-time)))
+    (catch #t
+      (lambda ()
+        ($stat 'set
+               #:id stat
+               #:stat_data stat-data
+               #:stat_cmd cmd
+               #:updated_at now))
+      (lambda (key . args)
+        (let* ((conn (get-conn-from-pool!)))
+          (DB-query conn
+                    (->sql update
+                           'stat set
+                           `((id ,stat)
+                             (stat_data ,(escape-str stat-data))
+                             (stat_cmd ,cmd)
+                             (updated_at ,now))
+                           (where #:id stat)))
+          (DB-close conn))))))
