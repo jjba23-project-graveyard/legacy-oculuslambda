@@ -101,6 +101,7 @@
                           guile-ares-rs
                           artanis
                           guile-hygguile
+                          guile-fibers
                           guile-dbi
                           guile-dbd-sqlite3))
 

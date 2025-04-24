@@ -21,13 +21,38 @@
         (artanis i18n)
         (artanis i18n locale)
         (app views index)
-        (oculuslambda html))
+        (oculuslambda html)
+        (oculuslambda process))
+
+(define (get-uptime)
+  (syscall-silent "uptime"))
+
+(define (get-uname)
+  (syscall-silent "uname -a"))
+
+(define (get-hostname)
+  (syscall-silent "hostname"))
+
+(define (get-mem)
+  (syscall-silent "free -h"))
+
+(define (get-disk)
+  (syscall-silent "df -h"))
+
+(define (get-part)
+  (syscall-silent "lsblk"))
 
 (get "/"
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (response-emit (:mime rc
-                       (dashboard-page rc)))))
+       (let* ((state `((hostname ,(get-hostname))
+                       (uptime ,(get-uptime))
+                       (uname ,(get-uname))
+                       (mem ,(get-mem))
+                       (part ,(get-part))
+                       (disk ,(get-disk)))))
+         (response-emit (:mime rc
+                         (dashboard-page rc state))))))
 
 

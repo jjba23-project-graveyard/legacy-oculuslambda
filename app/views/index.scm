@@ -26,9 +26,14 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (dashboard-page rc)
+(define-public (dashboard-page rc state)
   (let* ((G_ (:i18n rc))
-         (welcome-html `((p ,(G_ "dashboard")))))
+         (welcome-html `((h1 (@(class ,(->css '(text-2xl font-bold)))) ,(G_ "oculuslambda"))
+                         (h3 (em ,(G_ "the eye into the system's functioning")))
+                         (dl (@(class ,(->css '(mx-1 my-4))))
+                             ,(map (lambda(s)
+                                     `((dt (@(class ,(->css '(font-bold)))) ,(symbol->string (car s)))
+                                       (dd (@(class ,(->css '( overflow-auto text-sm p-1 mx-2 whitespace-pre font-mono)))) ,(cdr s)))) state)))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))

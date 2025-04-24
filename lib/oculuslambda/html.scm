@@ -69,8 +69,10 @@
   (export oculuslambda-html-template))
 
 (define-public (page-top G_)
-  `(p ,(G_ "Hello world ! (from oculuslambda)")))
+  `(p ,(G_ "work in progress!")))
 
 (define-public (page-footer G_)
-  `(p ,(G_ "Copyright &copy; Josep Bigorra &lt;jjbigorra@gmail.com&gt;")))
+  `((div
+     (p ,(G_ "licensed under the GPL v3 or later"))
+     (p ,(G_ "Copyright &copy; Josep Bigorra &lt;jjbigorra@gmail.com&gt;")))))
 
