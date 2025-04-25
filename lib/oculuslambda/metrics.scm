@@ -96,7 +96,7 @@
    (lambda()
      (spawn-fiber (lambda()
                     (while #t
-                      (sleep (* 0.5 60))
+                      (sleep (* 5 60))
                       (display "\ncollecting stats\n")
                       (record-stat 'hostname "hostname")
                       (record-stat 'uptime "uptime")
@@ -109,6 +109,6 @@
                       )))
      (spawn-fiber (lambda()
                     (while #t
-                      (sleep (* 0.1 60))
+                      (sleep (* 1 60))
                       (record-time-stat 'cpu "uptime | awk '{print substr($9, 1, length($9)-1)}'")))))
    #:drain? #t))
