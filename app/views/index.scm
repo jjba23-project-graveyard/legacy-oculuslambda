@@ -40,7 +40,7 @@
                                                 (G_ "welcome to oculuslambda"))
                                 #:body welcome-html)))
 
-(define-public (system-detail-list-page rc state)
+(define-public (system-detail-list-page rc all-stats)
   (let* ((G_ (:i18n rc))
          (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4 flex flex-col gap-3))))
                              ,(map (lambda (s)
@@ -54,13 +54,13 @@
                                                                     font-mono))))
                                                 ,(unescape-str (assoc-ref s
                                                                           "stat_data"))))))
-                                   state)))))
+                                   (assoc-ref all-stats 'fixed-stats))))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
                                 #:body welcome-html)))
 
-(define-public (system-detail-grid-page rc state)
+(define-public (system-detail-grid-page rc all-stats)
   (let* ((G_ (:i18n rc))
          (welcome-html `((div (@ (class ,(->css '(mx-1 my-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2))))
                               ,(map (lambda (s)
@@ -75,7 +75,7 @@
                                                                             "stat_data"))))
                                         
                                         ))
-                                    state)))))
+                                    (assoc-ref all-stats 'fixed-stats))))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))

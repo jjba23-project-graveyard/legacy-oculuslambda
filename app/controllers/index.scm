@@ -30,32 +30,39 @@
         (ice-9 match)
         (oculuslambda process))
 
-
 (get "/"
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (welcome-page rc)))))
+                             (welcome-page rc)))))
+
+(define (get-all-stats rc)
+  (let* ((stats ($stat 'get))
+         (time-stats ($time_stat 'get))
+         (cpu-stats (filter (lambda (s)
+                              (equal? "cpu"
+                                      (assoc-ref s "id"))) time-stats))
+         (mem-stats (filter (lambda (s)
+                              (equal? "mem"
+                                      (assoc-ref s "id"))) time-stats))
+         (all-stats `((fixed-stats unquote stats)
+                      (timeline-stats (cpu unquote cpu-stats)
+                                      (mem unquote mem-stats)))))
+    all-stats))
 
 (get "/dashboard/system-detail-grid"
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (let* ((stats ($stat 'get))
-              ;; (time-stats ($time_stat 'get))
-              (time-stats '())
-              (all-stats (append stats time-stats)))
-         (response-emit (:mime rc
-                         (system-detail-grid-page rc all-stats))))))
+       (response-emit (:mime rc
+                             (system-detail-grid-page rc
+                                                      (get-all-stats rc))))))
 
 (get "/dashboard/system-detail-list"
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (let* ((stats ($stat 'get))
-              ;; (time-stats ($time_stat 'get))
-              (time-stats '())
-              (all-stats (append stats time-stats)))
-         (response-emit (:mime rc
-                         (system-detail-list-page rc all-stats))))))
+       (response-emit (:mime rc
+                             (system-detail-list-page rc
+                                                      (get-all-stats rc))))))

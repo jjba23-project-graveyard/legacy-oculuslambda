@@ -35,7 +35,7 @@
   #:use-module (ice-9 iconv))
 
 (define-public (record-stat stat cmd)
-  (let* ((stat-data (syscall-silent cmd))
+  (let* ((stat-data (syscall cmd))
          (now (current-time)))
     (catch #t
       (lambda ()
@@ -60,7 +60,7 @@
                              cmd key args))))))))
 
 (define-public (record-time-stat stat cmd)
-  (let* ((stat-data (syscall-silent cmd))
+  (let* ((stat-data (syscall cmd))
          (retention-period (* 48 60 60))
          (now (current-time)))
     (catch #t
@@ -97,7 +97,6 @@
      (spawn-fiber (lambda()
                     (while #t
                       (sleep (* 1 60))
-                      (display "\ncollecting stats\n")
                       (record-stat 'hostname "hostname")
                       (record-stat 'uptime "uptime")
                       (record-stat 'uname "uname -a")
