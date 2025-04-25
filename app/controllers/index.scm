@@ -39,7 +39,7 @@
 
 (define (get-all-stats rc)
   (let* ((stats ($stat 'get))
-         (time-stats ($time_stat 'get))
+         (time-stats ($time_stat 'get #:order-by "updated_at ASC"))
          (cpu-stats (filter (lambda (s)
                               (equal? "cpu"
                                       (assoc-ref s "id"))) time-stats))

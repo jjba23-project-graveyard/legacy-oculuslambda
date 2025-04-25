@@ -45,6 +45,7 @@
                              ,(map (lambda (s)
                                      `((div (@ (class ,(->css '(p-2
                                                                 bg-stone-300
+                                                                shadow-md
                                                                 rounded-xl))))
                                             (dt (@ (class ,(->css '(font-bold))))
                                                 ,(assoc-ref s "id"))
@@ -64,20 +65,35 @@
 
 (define-public (system-detail-grid-page rc all-stats)
   (let* ((G_ (:i18n rc))
+         (numeric-cpu-stat (lambda (s)
+                             (string->number (format #f "-~a"
+                                                     (string-replace-substring
+                                                      (assoc-ref s "stat_data")
+                                                      "," ".")))))
          (cpu-data (assoc-ref (assoc-ref all-stats
                                          'timeline-stats)
                               'cpu))
          (first-cpu-moment (assoc-ref (car cpu-data) "updated_at"))
+         (last-cpu-moment (assoc-ref (list-ref cpu-data
+                                               (- (length cpu-data) 1))
+                                     "updated_at"))
+         (highest-cpu-moment (apply min
+                                    (map numeric-cpu-stat cpu-data)))
+         (cpu-view-box (format #f "0 ~a ~a ~a" highest-cpu-moment
+                               (- last-cpu-moment first-cpu-moment)
+                               (* -1 highest-cpu-moment)))
          (cpu-points (string-join (map (lambda (s)
                                          (format #f "~a,~a"
                                                  (- (assoc-ref s "updated_at")
                                                     first-cpu-moment)
-                                                 (string->number (string-replace-substring
-                                                                  (assoc-ref s
-                                                                   "stat_data")
-                                                                  "," "."))))
+                                                 (numeric-cpu-stat s)))
                                        cpu-data) " "))
-         (cpu-html `((div (svg (polyline (@ (points ,cpu-points)))))))
+         (cpu-html `((div (@ (class ,(->css '(p-2 bg-stone-300 rounded-xl
+                                                  shadow-md))))
+                          (span (@ (class ,(->css '(font-bold))))
+                                ,(G_ "cpu load graph"))
+                          (div (svg (@ (viewBox ,cpu-view-box))
+                                    (polyline (@ (points ,cpu-points))))))))
          (welcome-html `((div (@ (class ,(->css '(mx-1 my-4
                                                        grid
                                                        grid-cols-1
@@ -88,6 +104,7 @@
                               ,(map (lambda (s)
                                       `((div (@ (class ,(->css '(p-2
                                                                  bg-stone-300
+                                                                 shadow-md
                                                                  rounded-xl))))
                                              (span (@ (class ,(->css '(font-bold))))
                                                    ,(assoc-ref s "id"))
@@ -102,6 +119,7 @@
                                         ))
                                     (assoc-ref all-stats
                                                'fixed-stats))))))
+    
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
