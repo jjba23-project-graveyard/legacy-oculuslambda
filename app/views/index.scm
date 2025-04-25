@@ -33,8 +33,7 @@
          (welcome-html `((div (p ,(G_
                                    "oculuslambda is written in Lisp (Guile Scheme), leverages SXML, SQLite3, some basic POSIX / UNIX utilities, and the mighty GNU Artanis web-framework."))
                               (p ,(G_
-                                   "This is a system monitoring tool, observability, alerting, dashboarding and more, all configurable in Lisp (Guile Scheme).")))
-                         )))
+                                   "This is a system monitoring tool, observability, alerting, dashboarding and more, all configurable in Lisp (Guile Scheme)."))))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
@@ -44,17 +43,20 @@
   (let* ((G_ (:i18n rc))
          (welcome-html `((dl (@ (class ,(->css '(mx-1 my-4 flex flex-col gap-3))))
                              ,(map (lambda (s)
-                                     `((div (@(class ,(->css '(p-2 bg-stone-300 rounded-xl))))
+                                     `((div (@ (class ,(->css '(p-2
+                                                                bg-stone-300
+                                                                rounded-xl))))
                                             (dt (@ (class ,(->css '(font-bold))))
                                                 ,(assoc-ref s "id"))
                                             (dd (@ (class ,(->css '(overflow-auto
-                                                                    text-sm p-1
-                                                                    mx-2
+                                                                    text-sm
+                                                                    p-1 mx-2
                                                                     whitespace-pre
                                                                     font-mono))))
                                                 ,(unescape-str (assoc-ref s
-                                                                          "stat_data"))))))
-                                   (assoc-ref all-stats 'fixed-stats))))))
+                                                                "stat_data"))))))
+                                   (assoc-ref all-stats
+                                              'fixed-stats))))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
@@ -62,22 +64,47 @@
 
 (define-public (system-detail-grid-page rc all-stats)
   (let* ((G_ (:i18n rc))
-         (welcome-html `((div (@ (class ,(->css '(mx-1 my-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2))))
+         (cpu-data (assoc-ref (assoc-ref all-stats
+                                         'timeline-stats)
+                              'cpu))
+         (first-cpu-moment (assoc-ref (car cpu-data) "updated_at"))
+         (cpu-points (string-join (map (lambda (s)
+                                         (format #f "~a,~a"
+                                                 (- (assoc-ref s "updated_at")
+                                                    first-cpu-moment)
+                                                 (string->number (string-replace-substring
+                                                                  (assoc-ref s
+                                                                   "stat_data")
+                                                                  "," "."))))
+                                       cpu-data) " "))
+         (cpu-html `((div (svg (polyline (@ (points ,cpu-points)))))))
+         (welcome-html `((div (@ (class ,(->css '(mx-1 my-4
+                                                       grid
+                                                       grid-cols-1
+                                                       sm:grid-cols-1
+                                                       md:grid-cols-2
+                                                       lg:grid-cols-3
+                                                       gap-2))))
                               ,(map (lambda (s)
-                                      `((div (@(class ,(->css '(p-2 bg-stone-300 rounded-xl))))
-                                             (span (@(class ,(->css '(font-bold)))) ,(assoc-ref s "id"))
+                                      `((div (@ (class ,(->css '(p-2
+                                                                 bg-stone-300
+                                                                 rounded-xl))))
+                                             (span (@ (class ,(->css '(font-bold))))
+                                                   ,(assoc-ref s "id"))
                                              (div (@ (class ,(->css '(overflow-auto
-                                                                      text-sm p-1
-                                                                      mx-2
+                                                                      text-sm
+                                                                      p-1 mx-2
                                                                       whitespace-pre
                                                                       font-mono))))
                                                   ,(unescape-str (assoc-ref s
-                                                                            "stat_data"))))
+                                                                  "stat_data"))))
                                         
                                         ))
-                                    (assoc-ref all-stats 'fixed-stats))))))
+                                    (assoc-ref all-stats
+                                               'fixed-stats))))))
     (oculuslambda-html-template G_
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
-                                #:body welcome-html)))
+                                #:body `((div ,cpu-html
+                                              ,welcome-html)))))
 
