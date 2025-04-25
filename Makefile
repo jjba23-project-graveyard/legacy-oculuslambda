@@ -138,7 +138,8 @@ fmt:
 init-db:
 	$(call oculuslambda-log-info,"initializing a new database")
 	-rm -v $(OCULUSLAMBDA_DB) $(OCULUSLAMBDA_DB)-shm $(OCULUSLAMBDA_DB)-wal
-	sqlite3 oculuslambda.db 'PRAGMA journal_mode=WAL;'
+	touch oculuslambda.db
+	guix shell -m manifest.scm -- sqlite3 oculuslambda.db 'PRAGMA journal_mode=WAL;'
 
 # Compile translation files to .mo files
 compile-i18n:

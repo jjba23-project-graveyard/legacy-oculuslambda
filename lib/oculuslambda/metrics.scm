@@ -96,19 +96,19 @@
    (lambda()
      (spawn-fiber (lambda()
                     (while #t
-                      (sleep (* 5 60))
+                      (sleep (* 1 60))
                       (display "\ncollecting stats\n")
                       (record-stat 'hostname "hostname")
                       (record-stat 'uptime "uptime")
                       (record-stat 'uname "uname -a")
                       (record-stat 'disk "df -h")
                       (record-stat 'part "lsblk")
-                      ;; mem is total,used,free,available format
-                      (record-stat 'mem
-                                   "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")
                       )))
      (spawn-fiber (lambda()
                     (while #t
-                      (sleep (* 1 60))
-                      (record-time-stat 'cpu "uptime | awk '{print substr($9, 1, length($9)-1)}'")))))
+                      (sleep (* 0.2 60))
+                      (record-time-stat 'cpu "uptime | awk '{print substr($9, 1, length($9)-1)}'")
+                      ;; mem is total,used,free,available format
+                      (record-time-stat 'mem
+                                        "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")))))
    #:drain? #t))
