@@ -102,6 +102,7 @@
                       (record-stat 'uname "uname -a")
                       (record-stat 'disk "df -h")
                       (record-stat 'part "lsblk")
+                      (record-stat 'podman "podman ps -a")
                       )))
      (spawn-fiber (lambda()
                     (while #t
