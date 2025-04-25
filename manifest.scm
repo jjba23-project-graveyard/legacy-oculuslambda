@@ -103,5 +103,6 @@
                           guile-hygguile
                           guile-fibers
                           guile-dbi
+                          sqlite
                           guile-dbd-sqlite3))
 

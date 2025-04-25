@@ -70,14 +70,25 @@
                                     (use-modules (oculuslambda metrics)
                                                  (fibers)
                                                  (app models stat))
-                                    (while #t
-                                      (record-stat 'hostname "hostname")
-                                      (record-stat 'uptime "uptime")
-                                      (record-stat 'uname "uname -a")
-                                      (record-stat 'disk "df -h")
-                                      (record-stat 'part "lsblk")
-                                      (record-stat 'mem "free -h")
-                                      (sleep 30))))))
+                                    (run-fibers
+                                     (lambda()
+                                       (spawn-fiber (lambda()
+                                                      (while #t
+                                                        (sleep 30)
+                                                        (display "\ncollecting stats\n")
+                                                        (record-stat 'hostname "hostname")
+                                                        (record-stat 'uptime "uptime")
+                                                        (record-stat 'uname "uname -a")
+                                                        (record-stat 'disk "df -h")
+                                                        (record-stat 'part "lsblk")
+                                                        (record-stat 'mem "free -h")
+                                                        )))
+                                       (spawn-fiber (lambda()
+                                                      (while #t
+                                                        (sleep 10)
+                                                        (display "\ncollecting CPU stats\n")
+                                                        ))))
+                                     #:drain? #t)))))
     (set! worker-thread t)))
 
 ;; Add hook on before running the Artanis application to start the queue worker
