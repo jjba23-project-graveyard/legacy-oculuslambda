@@ -48,6 +48,8 @@
                                                          "pub/css/fonts.css"))
                                       (style ,(assoc-ref asset-library
                                                          "pub/css/phosphor.css"))
+                                      (style ,(assoc-ref asset-library
+                                                         "pub/css/graph.css"))
 
                                       ,maybe-auto-refresh
                                       (meta (@ (name viewport)
@@ -57,7 +59,7 @@
                                                           "pub/js/tailwind.js"))
                                       (script ,(assoc-ref asset-library
                                                           "pub/js/tailwind.config.js")))
-                                (body (@ (class ,(->css '(bg-stone-200))))
+                                (body (@ (class ,(->css '(bg-stone-800))))
                                       (div (@ (class ,(->css '(flex flex-col
                                                                     h-screen
                                                                     justify-between))))
@@ -70,23 +72,30 @@
   (export oculuslambda-html-template))
 
 (define-public (page-top G_)
-  `((div (@(class ,(->css '(my-6 mx-2 flex flex-col gap-3))))
-         (div (@(class ,(->css '(flex flex-row flex-wrap justify-left align-center gap-3))))
-              (h1 (@ (class ,(->css '(text-3xl font-bold))))
+  `((div (@(class ,(->css '(my-6 mx-3 flex flex-col gap-3))))
+         (div (@(class ,(->css '(flex flex-row flex-wrap justify-between align-center gap-3))))
+              (h1 (@ (class ,(->css '(text-3xl font-bold text-stone-300))))
                   (a (@(href "/")) ,(G_ "oculuslambda")))
               (div (@ (class ,(->css '(flex flex-row flex-wrap
                                             gap-4
                                             justify-center
                                             align-center w-max))))
-                   (a (@ (href "/dashboard/system-detail-list"))
-                      ,(hyg-icon-button #:icon 'list  #:content (G_
-                                                                 "list view")))
                    (a (@ (href "/dashboard/system-detail-grid"))
-                      ,(hyg-icon-button #:icon 'squares-four #:content (G_
-                                                                        "grid view")))))
-         (h3 (em ,(G_ "the eye into the system's functioning"))))))
+                      ,(hyg-icon-button #:background 'bg-stone-600
+                                        #:icon 'squares-four
+                                        #:content (G_
+                                                   "system details")))))
+         (h3 (@(class ,(->css '(text-stone-400)))) (em ,(G_ "the eye into the system's functioning"))))))
 
 (define-public (page-footer G_)
-  `((div (p ,(G_ "licensed under the GPL v3 or later"))
-         (p ,(G_ "Copyright &copy; Josep Bigorra &lt;jjbigorra@gmail.com&gt;")))))
+  `((div (@(class ,(->css '(my-6 mx-3 flex flex-col gap-3))))
+         (em (@ (class ,(->css '(text-md text-stone-400))))
+             ,(G_ "licensed under the GPL v3 or later"))
+         (div (@(class ,(->css '(flex flex-row flex-wrap gap-3))))
+              (span (@ (class ,(->css '(text-md text-stone-400)))) ,(G_ "find the source code here:"))
+              (a (@(class ,(->css '(text-blue-400 font-bold)))(href "https://codeberg.org/jjba23/oculuslambda"))
+                 "codeberg.org/jjba23/oculuslambda"))
+
+         (p (@ (class ,(->css '(text-md text-stone-400))))
+            ,(G_ "Copyright &copy; Josep Bigorra &lt;jjbigorra@gmail.com&gt;")))))
 

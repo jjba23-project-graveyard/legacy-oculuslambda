@@ -56,5 +56,6 @@
 
 (define-public asset-library
   (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
+                         "pub/css/graph.css"
                          "pub/js/tailwind.js" "pub/js/tailwind.config.js")))
 

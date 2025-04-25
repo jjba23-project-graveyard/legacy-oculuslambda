@@ -1,0 +1,8 @@
+.chart-area {
+    fill: rgba(239,162,22,0.8);
+}
+
+.chart-line {
+    stroke: rgba(239,162,22,1);
+    stroke-width: 1px;
+}

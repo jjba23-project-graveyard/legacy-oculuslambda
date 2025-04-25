@@ -56,13 +56,6 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                             (system-detail-grid-page rc
-                                                      (get-all-stats rc))))))
+                       (system-detail-grid-page rc
+                                                (get-all-stats rc))))))
 
-(get "/dashboard/system-detail-list"
-     #:i18n '(cookie "lang")
-     #:mime 'xml
-     (lambda (rc)
-       (response-emit (:mime rc
-                             (system-detail-list-page rc
-                                                      (get-all-stats rc))))))
