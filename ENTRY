@@ -53,42 +53,16 @@
 ;; Set base locale for gettext at startup
 (setlocale LC_MESSAGES "en_US.UTF-8")
 
+
 ;; Store the thread object belonging to the oculuslambda queue worker
 (define worker-thread
   #f)
 
-
 ;; Procedure to start the oculuslambda queue worker to process jobs that haven't completed yet
 ;; this is preferrably done in a different thread
 (define (start-worker)
-  (let* ((t (call-with-new-thread (lambda ()
-                                    (display (format #f
-                                                     "\n~a...\n"
-                                                     (gettext
-                                                      "initializing oculuslambda queue worker")))
-
-                                    (use-modules (oculuslambda metrics)
-                                                 (fibers)
-                                                 (app models stat))
-                                    (run-fibers
-                                     (lambda()
-                                       (spawn-fiber (lambda()
-                                                      (while #t
-                                                        (sleep 30)
-                                                        (display "\ncollecting stats\n")
-                                                        (record-stat 'hostname "hostname")
-                                                        (record-stat 'uptime "uptime")
-                                                        (record-stat 'uname "uname -a")
-                                                        (record-stat 'disk "df -h")
-                                                        (record-stat 'part "lsblk")
-                                                        (record-stat 'mem "free -h")
-                                                        )))
-                                       (spawn-fiber (lambda()
-                                                      (while #t
-                                                        (sleep 10)
-                                                        (display "\ncollecting CPU stats\n")
-                                                        ))))
-                                     #:drain? #t)))))
+  (use-modules (oculuslambda metrics))
+  (let* ((t (call-with-new-thread oculuslambda-worker-thread)))
     (set! worker-thread t)))
 
 ;; Add hook on before running the Artanis application to start the queue worker

@@ -23,6 +23,7 @@
         (app views index)
         (oculuslambda html)
         (app models stat)
+        (app models time_stat)
         (oculuslambda metrics)
         (fibers)
         (fibers channels)
@@ -41,14 +42,20 @@
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (let* ((stats ($stat 'get)))
+       (let* ((stats ($stat 'get))
+              ;; (time-stats ($time_stat 'get))
+              (time-stats '())
+              (all-stats (append stats time-stats)))
          (response-emit (:mime rc
-                         (system-detail-grid-page rc stats))))))
+                         (system-detail-grid-page rc all-stats))))))
 
 (get "/dashboard/system-detail-list"
      #:i18n '(cookie "lang")
      #:mime 'xml
      (lambda (rc)
-       (let* ((stats ($stat 'get)))
+       (let* ((stats ($stat 'get))
+              ;; (time-stats ($time_stat 'get))
+              (time-stats '())
+              (all-stats (append stats time-stats)))
          (response-emit (:mime rc
-                         (system-detail-list-page rc stats))))))
+                         (system-detail-list-page rc all-stats))))))

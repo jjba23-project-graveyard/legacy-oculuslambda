@@ -22,9 +22,11 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 regex)
   #:use-module (app models stat)
+  #:use-module (app models time_stat)
   #:use-module (srfi srfi-1)
   #:use-module (artanis db)
   #:use-module (artanis ssql)
+  #:use-module (fibers)
   #:use-module (srfi srfi-64)
   #:use-module (oculuslambda prelude)
   #:use-module (oculuslambda process)
@@ -36,25 +38,77 @@
   (let* ((stat-data (syscall-silent cmd))
          (now (current-time)))
     (catch #t
-           (lambda ()
-             ($stat 'set
+      (lambda ()
+        ($stat 'set
+               #:id stat
+               #:stat_data (escape-str stat-data)
+               #:updated_at now))
+      (lambda (key . args)
+        (catch #t
+          (lambda ()
+            (let* ((conn (get-conn-from-pool!)))
+              (DB-query conn
+                        (->sql update
+                               'stat set
+                               `((id ,stat)
+                                 (stat_data ,(escape-str stat-data))
+                                 (updated_at ,now))
+                               (where #:id stat)))
+              (DB-close conn)))
+          (lambda (key . args)
+            (display (format #f "error saving metric: ~a: ~a: ~a ~a" stat
+                             cmd key args))))))))
+
+(define-public (record-time-stat stat cmd)
+  (let* ((stat-data (syscall-silent cmd))
+         (retention-period (* 48 60 60))
+         (now (current-time)))
+    (catch #t
+      (lambda ()
+        (let* ((conn (get-conn-from-pool!)))
+          (DB-query conn
+                    (format #f "DELETE FROM time_stat WHERE updated_at < ~a" (- now retention-period)))
+          (DB-close conn)))  
+      (lambda (key . args)
+        (display (format #f "error cleaning metric: ~a: ~a ~a" stat key args))))
+    (catch #t
+      (lambda ()
+        ($time_stat 'set
                     #:id stat
-                    #:stat_data stat-data
-                    #:stat_cmd cmd
+                    #:stat_data (escape-str stat-data)
                     #:updated_at now))
-           (lambda (key . args)
-             (catch #t
-                    (lambda ()
-                      (let* ((conn (get-conn-from-pool!)))
-                        (DB-query conn
-                                  (->sql update
-                                         'stat set
-                                         `((id ,stat)
-                                           (stat_data ,(escape-str stat-data))
-                                           (stat_cmd ,cmd)
-                                           (updated_at ,now))
-                                         (where #:id stat)))
-                        (DB-close conn)))
-                    (lambda (key . args)
-                      (display (format #f "error saving metric: ~a: ~a!" stat
-                                       cmd))))))))
+      (lambda (key . args)
+        (display (format #f "error saving metric: ~a: ~a: ~a ~a" stat
+                         cmd key args))))))
+
+(define-public (oculuslambda-worker-thread)
+  (display (format #f
+                   "\n~a...\n"
+                   (gettext
+                    "initializing oculuslambda queue worker")))
+
+  (use-modules (oculuslambda metrics)
+               (fibers)
+               (app models stat)
+               (app models time_stat))
+  
+  (run-fibers
+   (lambda()
+     (spawn-fiber (lambda()
+                    (while #t
+                      (sleep (* 0.5 60))
+                      (display "\ncollecting stats\n")
+                      (record-stat 'hostname "hostname")
+                      (record-stat 'uptime "uptime")
+                      (record-stat 'uname "uname -a")
+                      (record-stat 'disk "df -h")
+                      (record-stat 'part "lsblk")
+                      ;; mem is total,used,free,available format
+                      (record-stat 'mem
+                                   "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")
+                      )))
+     (spawn-fiber (lambda()
+                    (while #t
+                      (sleep (* 0.1 60))
+                      (record-time-stat 'cpu "uptime | awk '{print substr($9, 1, length($9)-1)}'")))))
+   #:drain? #t))
