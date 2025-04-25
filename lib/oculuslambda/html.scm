@@ -37,17 +37,17 @@
                                        #:key title body
                                        (should-auto-refresh #f))
     (let ((maybe-auto-refresh (cond
-                               ((equal? should-auto-refresh #t)
-                                `(meta (@ (content "10")
-                                          (http-equiv "refresh")) ()))
-                               (else `()))))
+                                ((equal? should-auto-refresh #t)
+                                 `(meta (@ (content "10")
+                                           (http-equiv "refresh")) ()))
+                                (else `()))))
       
       `("<!DOCTYPE html>" (html (@ (lang en))
                                 (head (title ,title)
                                       (style ,(assoc-ref asset-library
                                                          "pub/css/fonts.css"))
                                       (style ,(assoc-ref asset-library
-                                                         "pub/css/phosphor.css"))
+                                               "pub/css/phosphor.css"))
                                       (style ,(assoc-ref asset-library
                                                          "pub/css/graph.css"))
 
@@ -56,13 +56,13 @@
                                                (content
                                                 "width=device-width, initial-scale=1.0")))
                                       (script ,(assoc-ref asset-library
-                                                          "pub/js/tailwind.js"))
+                                                "pub/js/tailwind.js"))
                                       (script ,(assoc-ref asset-library
-                                                          "pub/js/tailwind.config.js")))
+                                                "pub/js/tailwind.config.js")))
                                 (body (@ (class ,(->css '(bg-stone-800))))
                                       (div (@ (class ,(->css '(flex flex-col
-                                                                    h-screen
-                                                                    justify-between))))
+                                                               h-screen
+                                                               justify-between))))
                                            (div ,(page-top G_)
                                                 (div (@ (class ,(->css '(my-4
                                                                          container
@@ -72,28 +72,34 @@
   (export oculuslambda-html-template))
 
 (define-public (page-top G_)
-  `((div (@(class ,(->css '(my-6 mx-3 flex flex-col gap-3))))
-         (div (@(class ,(->css '(flex flex-row flex-wrap justify-between align-center gap-3))))
+  `((div (@ (class ,(->css '(my-6 mx-3 flex flex-col gap-3))))
+         (div (@ (class ,(->css '(flex flex-row flex-wrap justify-between
+                                       align-center gap-3))))
               (h1 (@ (class ,(->css '(text-3xl font-bold text-stone-300))))
-                  (a (@(href "/")) ,(G_ "oculuslambda")))
-              (div (@ (class ,(->css '(flex flex-row flex-wrap
+                  (a (@ (href "/"))
+                     ,(G_ "oculuslambda")))
+              (div (@ (class ,(->css '(flex flex-row
+                                            flex-wrap
                                             gap-4
                                             justify-center
-                                            align-center w-max))))
+                                            align-center
+                                            w-max))))
                    (a (@ (href "/dashboard/system-detail-grid"))
                       ,(hyg-icon-button #:background 'bg-stone-600
                                         #:icon 'squares-four
-                                        #:content (G_
-                                                   "system details")))))
-         (h3 (@(class ,(->css '(text-stone-400)))) (em ,(G_ "the eye into the system's functioning"))))))
+                                        #:content (G_ "system details")))))
+         (h3 (@ (class ,(->css '(text-stone-400))))
+             (em ,(G_ "the eye into the system's functioning"))))))
 
 (define-public (page-footer G_)
-  `((div (@(class ,(->css '(my-6 mx-3 flex flex-col gap-3))))
+  `((div (@ (class ,(->css '(my-6 mx-3 flex flex-col gap-3))))
          (em (@ (class ,(->css '(text-md text-stone-400))))
              ,(G_ "licensed under the GPL v3 or later"))
-         (div (@(class ,(->css '(flex flex-row flex-wrap gap-3))))
-              (span (@ (class ,(->css '(text-md text-stone-400)))) ,(G_ "find the source code here:"))
-              (a (@(class ,(->css '(text-blue-400 font-bold)))(href "https://codeberg.org/jjba23/oculuslambda"))
+         (div (@ (class ,(->css '(flex flex-row flex-wrap gap-3))))
+              (span (@ (class ,(->css '(text-md text-stone-400))))
+                    ,(G_ "find the source code here:"))
+              (a (@ (class ,(->css '(text-blue-400 font-bold)))
+                    (href "https://codeberg.org/jjba23/oculuslambda"))
                  "codeberg.org/jjba23/oculuslambda"))
 
          (p (@ (class ,(->css '(text-md text-stone-400))))

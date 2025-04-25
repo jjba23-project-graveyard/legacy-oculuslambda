@@ -38,77 +38,85 @@
   (let* ((stat-data (syscall cmd))
          (now (current-time)))
     (catch #t
-      (lambda ()
-        ($stat 'set
-               #:id stat
-               #:stat_data (escape-str stat-data)
-               #:updated_at now))
-      (lambda (key . args)
-        (catch #t
-          (lambda ()
-            (let* ((conn (get-conn-from-pool!)))
-              (DB-query conn
-                        (->sql update
-                               'stat set
-                               `((id ,stat)
-                                 (stat_data ,(escape-str stat-data))
-                                 (updated_at ,now))
-                               (where #:id stat)))
-              (DB-close conn)))
-          (lambda (key . args)
-            (display (format #f "error saving metric: ~a: ~a: ~a ~a" stat
-                             cmd key args))))))))
+           (lambda ()
+             ($stat 'set
+                    #:id stat
+                    #:stat_data (escape-str stat-data)
+                    #:updated_at now))
+           (lambda (key . args)
+             (catch #t
+                    (lambda ()
+                      (let* ((conn (get-conn-from-pool!)))
+                        (DB-query conn
+                                  (->sql update
+                                         'stat set
+                                         `((id ,stat)
+                                           (stat_data ,(escape-str stat-data))
+                                           (updated_at ,now))
+                                         (where #:id stat)))
+                        (DB-close conn)))
+                    (lambda (key . args)
+                      (display (format #f
+                                       "error saving metric: ~a: ~a: ~a ~a"
+                                       stat
+                                       cmd
+                                       key
+                                       args))))))))
 
 (define-public (record-time-stat stat cmd)
   (let* ((stat-data (syscall cmd))
          (retention-period (* 48 60 60))
          (now (current-time)))
     (catch #t
-      (lambda ()
-        (let* ((conn (get-conn-from-pool!)))
-          (DB-query conn
-                    (format #f "DELETE FROM time_stat WHERE updated_at < ~a" (- now retention-period)))
-          (DB-close conn)))  
-      (lambda (key . args)
-        (display (format #f "error cleaning metric: ~a: ~a ~a" stat key args))))
+           (lambda ()
+             (let* ((conn (get-conn-from-pool!)))
+               (DB-query conn
+                         (format #f
+                          "DELETE FROM time_stat WHERE updated_at < ~a"
+                          (- now retention-period)))
+               (DB-close conn)))
+           (lambda (key . args)
+             (display (format #f "error cleaning metric: ~a: ~a ~a" stat key
+                              args))))
     (catch #t
-      (lambda ()
-        ($time_stat 'set
-                    #:id stat
-                    #:stat_data (escape-str stat-data)
-                    #:updated_at now))
-      (lambda (key . args)
-        (display (format #f "error saving metric: ~a: ~a: ~a ~a" stat
-                         cmd key args))))))
+           (lambda ()
+             ($time_stat 'set
+                         #:id stat
+                         #:stat_data (escape-str stat-data)
+                         #:updated_at now))
+           (lambda (key . args)
+             (display (format #f
+                              "error saving metric: ~a: ~a: ~a ~a"
+                              stat
+                              cmd
+                              key
+                              args))))))
 
 (define-public (oculuslambda-worker-thread)
-  (display (format #f
-                   "\n~a...\n"
-                   (gettext
-                    "initializing oculuslambda queue worker")))
+  (display (format #f "\n~a...\n"
+                   (gettext "initializing oculuslambda queue worker")))
 
   (use-modules (oculuslambda metrics)
                (fibers)
                (app models stat)
                (app models time_stat))
-  
-  (run-fibers
-   (lambda()
-     (spawn-fiber (lambda()
-                    (while #t
-                      (sleep (* 1 60))
-                      (record-stat 'hostname "hostname")
-                      (record-stat 'uptime "uptime")
-                      (record-stat 'uname "uname -a")
-                      (record-stat 'disk "df -h")
-                      (record-stat 'part "lsblk")
-                      (record-stat 'podman "podman ps -a")
-                      )))
-     (spawn-fiber (lambda()
-                    (while #t
-                      (sleep (* 0.2 60))
-                      (record-time-stat 'cpu "uptime | awk '{print substr($9, 1, length($9)-1)}'")
-                      ;; mem is total,used,free,available format
-                      (record-time-stat 'mem
-                                        "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")))))
-   #:drain? #t))
+
+  (run-fibers (lambda ()
+                (spawn-fiber (lambda ()
+                               (while #t
+                                      (sleep (* 1 60))
+                                      (record-stat 'hostname "hostname")
+                                      (record-stat 'uptime "uptime")
+                                      (record-stat 'uname "uname -a")
+                                      (record-stat 'disk "df -h")
+                                      (record-stat 'part "lsblk")
+                                      (record-stat 'podman "podman ps -a"))))
+                (spawn-fiber (lambda ()
+                               (while #t
+                                      (sleep (* 0.2 60))
+                                      (record-time-stat 'cpu
+                                       "uptime | awk '{print substr($9, 1, length($9)-1)}'")
+                                      ;; mem is total,used,free,available format
+                                      (record-time-stat 'mem
+                                       "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")))))
+              #:drain? #t))

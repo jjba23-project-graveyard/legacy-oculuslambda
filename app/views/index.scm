@@ -78,7 +78,8 @@
                                          'timeline-stats)
                               'cpu))
          (highest-cpu-stat #f)
-         (latest-cpu-stat (list-ref cpu-data (- (length cpu-data) 1)))
+         (latest-cpu-stat (list-ref cpu-data
+                                    (- (length cpu-data) 1)))
          (_ (for-each (lambda (s)
                         (if highest-cpu-stat
                             (when (> (numeric-cpu-stat s)
@@ -89,7 +90,8 @@
                                          'timeline-stats)
                               'mem))
          (highest-mem-stat #f)
-         (latest-mem-stat (list-ref mem-data (- (length mem-data) 1)))
+         (latest-mem-stat (list-ref mem-data
+                                    (- (length mem-data) 1)))
          (_ (for-each (lambda (s)
                         (if highest-mem-stat
                             (when (> (numeric-mem-stat s)
@@ -105,45 +107,48 @@
                                                      (strftime "%c"
                                                                (localtime (assoc-ref
                                                                            latest-cpu-stat
-                                                                           "updated_at")))))
-                     ,(make-card #:title (G_ "highest CPU load")
-                                 #:stat-data (format #f "~a on ~a"
-                                                     (assoc-ref
-                                                      highest-cpu-stat
-                                                      "stat_data")
-                                                     (strftime "%c"
-                                                               (localtime (assoc-ref
-                                                                           highest-cpu-stat
-                                                                           "updated_at")))))))
+                                                                           "updated_at"))))) ,
+                     (make-card #:title (G_ "highest CPU load")
+                                #:stat-data (format #f "~a on ~a"
+                                                    (assoc-ref
+                                                     highest-cpu-stat
+                                                     "stat_data")
+                                                    (strftime "%c"
+                                                              (localtime (assoc-ref
+                                                                          highest-cpu-stat
+                                                                          "updated_at")))))))
          (mem-html `(,(make-card #:title (G_ "current memory usage")
                                  #:stat-data (format #f "~a GB of ~a GB on ~a"
                                                      (cadr (string-split (assoc-ref
                                                                           latest-mem-stat
-                                                                          "stat_data") #\space))
+                                                                          "stat_data")
+                                                                         #\space))
                                                      (car (string-split (assoc-ref
                                                                          latest-mem-stat
-                                                                         "stat_data") #\space))
+                                                                         "stat_data")
+                                                                        #\space))
                                                      (strftime "%c"
                                                                (localtime (assoc-ref
                                                                            latest-mem-stat
-                                                                           "updated_at")))))
-                     ,(make-card #:title (G_ "highest memory usage")
-                                 #:stat-data (format #f "~a GB of ~a GB on ~a"
-                                                     (cadr (string-split (assoc-ref
-                                                                          highest-mem-stat
-                                                                          "stat_data") #\space))
-                                                     (car (string-split (assoc-ref
+                                                                           "updated_at"))))) ,
+                     (make-card #:title (G_ "highest memory usage")
+                                #:stat-data (format #f "~a GB of ~a GB on ~a"
+                                                    (cadr (string-split (assoc-ref
                                                                          highest-mem-stat
-                                                                         "stat_data") #\space))
-                                                     (strftime "%c"
-                                                               (localtime (assoc-ref
-                                                                           highest-mem-stat
-                                                                           "updated_at")))))))
+                                                                         "stat_data")
+                                                                        #\space))
+                                                    (car (string-split (assoc-ref
+                                                                        highest-mem-stat
+                                                                        "stat_data")
+                                                                       #\space))
+                                                    (strftime "%c"
+                                                              (localtime (assoc-ref
+                                                                          highest-mem-stat
+                                                                          "updated_at")))))))
          ;; fixed stats
          (more-html (map (lambda (s)
                            (make-card #:title (assoc-ref s "id")
-                                      #:stat-data (unescape-str (assoc-ref
-                                                                 s
+                                      #:stat-data (unescape-str (assoc-ref s
                                                                  "stat_data"))))
                          (assoc-ref all-stats
                                     'fixed-stats))))
@@ -152,11 +157,11 @@
                                 #:title (format #f "oculuslambda - ~a"
                                                 (G_ "welcome to oculuslambda"))
                                 #:body `((div (@ (class ,(->css '(mx-1 my-4
-                                                                       flex
-                                                                       flex-row
-                                                                       flex-wrap
-                                                                       justify-left
-                                                                       gap-3))))
+                                                                  flex
+                                                                  flex-row
+                                                                  flex-wrap
+                                                                  justify-left
+                                                                  gap-3))))
                                               ,cpu-html
                                               ,mem-html
                                               ,more-html)))))

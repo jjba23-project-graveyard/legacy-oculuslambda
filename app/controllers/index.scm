@@ -39,7 +39,8 @@
 
 (define (get-all-stats rc)
   (let* ((stats ($stat 'get))
-         (time-stats ($time_stat 'get #:order-by "updated_at ASC"))
+         (time-stats ($time_stat 'get
+                                 #:order-by "updated_at ASC"))
          (cpu-stats (filter (lambda (s)
                               (equal? "cpu"
                                       (assoc-ref s "id"))) time-stats))
@@ -56,6 +57,6 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (system-detail-grid-page rc
-                                                (get-all-stats rc))))))
+                             (system-detail-grid-page rc
+                                                      (get-all-stats rc))))))
 

@@ -24,7 +24,6 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 threads))
 
-
 (define-public (syscall cmd)
   (let* ((process (open-input-pipe cmd))
          (process-output (get-string-all process)))
