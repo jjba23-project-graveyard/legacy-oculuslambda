@@ -118,5 +118,5 @@
                                        "sar -u 1 1 | tail -n 1 | awk '{print $3}'")
                                       ;; mem is total,used,free,available format
                                       (record-time-stat 'mem
-                                       "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")))))
+                                       "free -m | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")))))
               #:drain? #t))
