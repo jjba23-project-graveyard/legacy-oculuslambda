@@ -115,7 +115,7 @@
                                (while #t
                                       (sleep (* 0.2 60))
                                       (record-time-stat 'cpu
-                                       "uptime | awk '{print substr($9, 1, length($9)-1)}'")
+                                       "sar -u 1 1 | tail -n 1 | awk '{print $3}'")
                                       ;; mem is total,used,free,available format
                                       (record-time-stat 'mem
                                        "free -g | tail -n 2 | head -n 1 | awk '{print $2,$3,$4,$7}'")))))
