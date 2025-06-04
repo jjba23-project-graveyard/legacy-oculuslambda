@@ -65,7 +65,7 @@
 
 (define-public (record-time-stat stat cmd)
   (let* ((stat-data (syscall cmd))
-         (retention-period (* 48 60 60))
+         (retention-period (* 96 60 60))
          (now (current-time)))
     (catch #t
            (lambda ()
